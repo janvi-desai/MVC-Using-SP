@@ -1,0 +1,60 @@
+﻿@model ProductListModel
+
+@{
+    ViewBag.Title = "Product List";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Product List</h2>
+    <a href="@Url.Action("Add", "Product")" class="btn btn-success">+ New Product</a>
+</div>
+
+<form id="search-form">
+    <div class="input-group mb-3">
+        <input type="text" id="search" name="search" class="form-control" placeholder="Search products..." value="@Model.Search" />
+        <input type="hidden" id="pagesize" value="@Model.PageSize" />
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+<div id="product-list">
+    @await Html.PartialAsync("_ProductList", Model)
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        function loadProducts(page = 1) {
+            var search = $("#search").val();
+            var pagesize = $("#pagesize").val();
+
+            $.get("@Url.Action("GetPaginatedPartial")", { page, pagesize, search }, function (data) {
+                $("#product-list").html(data);
+            });
+        }
+
+        $(document).ready(function () {
+            loadProducts(1);
+        });
+
+        $(document).on("submit", "#search-form", function (e) {
+            e.preventDefault();
+            loadProducts(1);
+        });
+
+        $(document).on("click", ".pagination-link", function () {
+            var page = $(this).data("page");
+            loadProducts(page);
+        });
+
+        $(document).on("click", ".delete-btn", function () {
+            var id = $(this).data("id");
+            if (confirm("Are you sure you want to delete this product?")) {
+                $.post("@Url.Action("Delete")", { id: id }, function () {
+                    loadProducts();
+                });
+            }
+        });
+    </script>
+}

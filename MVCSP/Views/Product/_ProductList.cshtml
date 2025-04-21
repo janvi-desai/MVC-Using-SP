@@ -1,0 +1,52 @@
+﻿@model ProductListModel
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Is Sold</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Products.Any())
+        {
+            foreach (var product in Model.Products)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Price</td>
+                    <td>@product.Description</td>
+                    <td>@(product.IsSold ? "Yes" : "No")</td>
+                    <td>
+                        <a class="btn btn-sm btn-warning" href="@Url.Action("Edit", new { id = product.Id })">Edit</a>
+                        <a class="btn btn-sm btn-danger delete-btn" data-id="@product.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5" class="text-center">No products found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Pagination -->
+<nav>
+    <ul class="pagination">
+        @{
+            int totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+        }
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                <a href="javascript:void(0);" class="page-link pagination-link" data-page="@i">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
